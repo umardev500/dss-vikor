@@ -6,6 +6,11 @@ import (
 	"github.com/umardev500/spk/domain/model"
 )
 
+type UserUsecase interface {
+	Create(context.Context, model.User) error
+	Delete(context.Context, model.UserParams) error
+}
+
 type UserRepository interface {
 	Create(context.Context, model.User) error
 	Delete(context.Context, model.UserParams) error
