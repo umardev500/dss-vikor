@@ -18,7 +18,7 @@ func NewUserUsercase(repo domain.UserRepository) domain.UserUsecase {
 	}
 }
 
-func (u *userUsecase) Create(ctx context.Context, user model.User) (err error) {
+func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) (err error) {
 	err = u.repo.Create(ctx, user)
 
 	return

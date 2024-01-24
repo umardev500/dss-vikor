@@ -20,7 +20,7 @@ func NewUserRepository(trx *config.Trx) domain.UserRepository {
 	}
 }
 
-func (u *userRepository) Create(ctx context.Context, data model.User) (err error) {
+func (u *userRepository) Create(ctx context.Context, data model.UserCreate) (err error) {
 	log.Debug().Msgf("creating user: %v", data)
 	query := `--sql
 		INSERT INTO users (id, email, password, status)
@@ -28,13 +28,15 @@ func (u *userRepository) Create(ctx context.Context, data model.User) (err error
 	`
 
 	db := u.trx.GetConn(ctx)
-	_, err = db.ExecContext(ctx, query, data.ID, data.Email, data.Password, data.Status)
+	user := data.Data
+
+	_, err = db.ExecContext(ctx, query, user.ID, user.Email, user.Password, user.Status)
 	if err != nil {
 		log.Error().Msgf("error creating user: %v", err)
 		return
 	}
 
-	log.Debug().Msgf("created user: %v", data)
+	log.Debug().Msgf("created user: %v", user)
 
 	return
 }

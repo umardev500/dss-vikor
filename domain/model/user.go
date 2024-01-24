@@ -29,6 +29,11 @@ type UserUpdate struct {
 	Data   User
 }
 
+type UserCreate struct {
+	Params UserParams
+	Data   User
+}
+
 // User models
 type User struct {
 	ID        string       `json:"id"`
