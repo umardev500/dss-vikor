@@ -5,34 +5,39 @@ import (
 	"time"
 
 	fiber "github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/domain"
 	"github.com/umardev500/spk/domain/model"
 )
 
 type userDelivery struct {
-	uc domain.UserUsecase
+	uc     domain.UserUsecase
+	router fiber.Router
 }
 
-func NewUserDelivery(uc domain.UserUsecase) domain.UserDelivery {
-	return &userDelivery{
-		uc: uc,
+func NewUserDelivery(uc domain.UserUsecase, router fiber.Router) {
+	var handler domain.UserDelivery = &userDelivery{
+		uc:     uc,
+		router: router,
 	}
+
+	router.Post("/", handler.Create)
 }
 
 // Create implements domain.UserDelivery.
 func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
-	var userData model.UserCreate
-	if err := c.BodyParser(&userData); err != nil {
-		log.Error().Msgf("")
-		return err
-	}
+	// var userData model.UserCreate
+	// if err := c.BodyParser(&userData); err != nil {
+	// 	log.Error().Msgf("")
+	// 	return err
+	// }
 
-	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
-	defer cancel()
-	err = u.uc.Create(ctx, userData)
+	// ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	// defer cancel()
+	// err = u.uc.Create(ctx, userData)
 
-	return
+	// return ResponseHandler(c, err)
+
+	return nil
 }
 
 // Delete implements domain.UserDelivery.

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/constants"
 )

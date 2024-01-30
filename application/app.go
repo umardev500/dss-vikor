@@ -7,6 +7,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/umardev500/spk/config"
+	"github.com/umardev500/spk/routes"
 )
 
 type Application struct{}
@@ -19,6 +21,10 @@ func (a *Application) Start(ctx context.Context) (err error) {
 	server := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 	})
+	db := config.NewPostgres(ctx)
+	router := routes.NewRouter(server, db)
+	router.Register()
+
 	ch := make(chan error, 1)
 
 	go func() {
