@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/domain"
 	"github.com/umardev500/spk/domain/model"
+	"github.com/umardev500/spk/utils"
 )
 
 type userUsecase struct {
@@ -18,10 +22,19 @@ func NewUserUsercase(repo domain.UserRepository) domain.UserUsecase {
 	}
 }
 
-func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) (err error) {
-	err = u.repo.Create(ctx, user)
+func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.Response {
+	var response model.Response
+	err := u.repo.Create(ctx, user)
+	var uuid uuid.UUID = uuid.New()
+	if err != nil {
+		userMsg := "failed to create user"
+		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
 
-	return
+		msg := fmt.Sprintf("error creating user: %v uuid: %s", err, uuid)
+		log.Error().Msg(msg)
+	}
+
+	return response
 }
 
 func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) (err error) {

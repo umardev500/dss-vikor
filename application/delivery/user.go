@@ -5,8 +5,11 @@ import (
 	"time"
 
 	fiber "github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/domain"
 	"github.com/umardev500/spk/domain/model"
+	"github.com/umardev500/spk/utils"
 )
 
 type userDelivery struct {
@@ -25,19 +28,26 @@ func NewUserDelivery(uc domain.UserUsecase, router fiber.Router) {
 
 // Create implements domain.UserDelivery.
 func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
-	// var userData model.UserCreate
-	// if err := c.BodyParser(&userData); err != nil {
-	// 	log.Error().Msgf("")
-	// 	return err
-	// }
+	var userData model.UserToCreate
+	if err := c.BodyParser(&userData); err != nil {
+		uuid := uuid.New()
+		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+		bodyRaw := string(c.BodyRaw())
+		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
+		log.Error().Msg(logData)
 
-	// ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
-	// defer cancel()
-	// err = u.uc.Create(ctx, userData)
+		return c.JSON(resp)
+	}
 
-	// return ResponseHandler(c, err)
+	var userParams = model.UserCreate{
+		Data: &userData,
+	}
 
-	return nil
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+	resp := u.uc.Create(ctx, userParams)
+
+	return c.JSON(resp)
 }
 
 // Delete implements domain.UserDelivery.

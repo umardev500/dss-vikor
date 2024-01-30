@@ -1,7 +1,11 @@
 package delivery
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/umardev500/spk/domain/model"
+)
 
-func ResponseHandler(c *fiber.Ctx, err error) error {
-	return nil
+func OkResponse(c *fiber.Ctx, res model.Response) error {
+
+	return c.JSON(res)
 }

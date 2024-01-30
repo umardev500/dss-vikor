@@ -30,8 +30,16 @@ type UserUpdate struct {
 }
 
 type UserCreate struct {
-	Params UserParams
-	Data   User
+	Params *UserParams
+	Data   *UserToCreate
+}
+
+// User model to create
+type UserToCreate struct {
+	ID       string
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Status   UserStatus
 }
 
 // User models
