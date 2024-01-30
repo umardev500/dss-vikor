@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/config"
+	"github.com/umardev500/spk/database/migrations"
 	"github.com/umardev500/spk/routes"
 )
 
@@ -22,6 +23,7 @@ func (a *Application) Start(ctx context.Context) (err error) {
 		DisableStartupMessage: true,
 	})
 	db := config.NewPostgres(ctx)
+	migrations.Migrate(db) // migrate
 	router := routes.NewRouter(server, db)
 	router.Register()
 
