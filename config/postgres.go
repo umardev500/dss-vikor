@@ -14,6 +14,7 @@ import (
 )
 
 func NewPostgres(ctx context.Context) (db *sqlx.DB) {
+	log.Info().Msgf("Connecting to Postgres...")
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
