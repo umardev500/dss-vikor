@@ -29,7 +29,7 @@ func Migrate(db *sqlx.DB) {
 	err = m.Up()
 	if err != nil {
 		if err == migrate.ErrNoChange {
-			log.Error().Msg(err.Error())
+			log.Warn().Msg(err.Error())
 		} else {
 
 			log.Fatal().Msgf("failed to migrate: %v", err)
