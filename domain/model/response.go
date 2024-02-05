@@ -7,5 +7,5 @@ type Response struct {
 	Status  int64       `json:"status"`
 	Success bool        `json:"success"`
 	Message interface{} `json:"message"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 }

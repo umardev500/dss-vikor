@@ -36,6 +36,10 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 	err := u.repo.Create(ctx, user)
 	if err != nil {
 		userMsg := "failed to create user"
+		pqErr := utils.ParsePostgresError(err)
+		if pqErr != nil {
+			utils.CombinePqErr(pqErr.Error(), &userMsg)
+		}
 		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
 
 		msg := fmt.Sprintf("error creating user: %v uuid: %s", err, uuid)
