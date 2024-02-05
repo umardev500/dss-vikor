@@ -44,7 +44,10 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 
 		msg := fmt.Sprintf("error creating user: %v uuid: %s", err, uuid)
 		log.Error().Msg(msg)
+		return response
 	}
+
+	response = utils.ResponseBuilder(uuid, fiber.StatusCreated, true, "user created successfully", nil)
 
 	return response
 }

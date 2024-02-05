@@ -21,7 +21,6 @@ func NewUserRepository(trx *config.Trx) domain.UserRepository {
 }
 
 func (u *userRepository) Create(ctx context.Context, data model.UserCreate) (err error) {
-	log.Debug().Msgf("creating user")
 	query := `--sql
 		INSERT INTO users (id, email, password, status)
 		VALUES ($1, $2, $3, $4);
@@ -36,13 +35,10 @@ func (u *userRepository) Create(ctx context.Context, data model.UserCreate) (err
 		return
 	}
 
-	log.Debug().Msgf("created user: %v", user)
-
 	return
 }
 
 func (u *userRepository) Delete(ctx context.Context, params model.UserParams) (err error) {
-	log.Debug().Msgf("deleting user")
 	query := `--sql
 		DELETE FROM users WHERE id = $1;
 	`
@@ -60,7 +56,6 @@ func (u *userRepository) Delete(ctx context.Context, params model.UserParams) (e
 		return constants.ErrorNotAffected
 	}
 
-	log.Debug().Msgf("deleted user with id: %s", params.ID)
 	return
 }
 
