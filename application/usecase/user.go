@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/umardev500/spk/constants"
 	"github.com/umardev500/spk/domain"
 	"github.com/umardev500/spk/domain/model"
 	"github.com/umardev500/spk/utils"
@@ -24,8 +25,15 @@ func NewUserUsercase(repo domain.UserRepository) domain.UserUsecase {
 
 func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.Response {
 	var response model.Response
-	err := u.repo.Create(ctx, user)
 	var uuid uuid.UUID = uuid.New()
+	user.Data.ID = uuid
+
+	statusIsEmpty := user.Data.Status == ""
+	if statusIsEmpty {
+		user.Data.Status = constants.Inactive
+	}
+
+	err := u.repo.Create(ctx, user)
 	if err != nil {
 		userMsg := "failed to create user"
 		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)

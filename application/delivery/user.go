@@ -53,9 +53,14 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 // Delete implements domain.UserDelivery.
 func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
-	userID := "lorem"
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
 
-	var params = model.UserParams{ID: id, UserID: userID}
+	userID := uuid.New()
+
+	var params = model.UserParams{ID: uid, UserID: userID}
 	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
 	defer cancel()
 

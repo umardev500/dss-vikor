@@ -3,24 +3,20 @@ package model
 import (
 	"database/sql"
 	"time"
-)
 
-type UserStatus int64
-
-const (
-	UserStatusActive UserStatus = iota
-	UserStatusInactive
+	"github.com/google/uuid"
+	"github.com/umardev500/spk/constants"
 )
 
 type UserParams struct {
-	ID     string
-	UserID string
+	ID     uuid.UUID
+	UserID uuid.UUID
 }
 
 type UserFilter struct{}
 
 type UserFind struct {
-	ID      string
+	ID      uuid.UUID
 	Filters UserFilter
 }
 
@@ -36,19 +32,19 @@ type UserCreate struct {
 
 // User model to create
 type UserToCreate struct {
-	ID       string
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Status   UserStatus
+	ID       uuid.UUID
+	Email    string           `json:"email"`
+	Password string           `json:"password"`
+	Status   constants.Status `json:"status"`
 }
 
 // User models
 type User struct {
-	ID        string       `json:"id"`
-	Email     string       `json:"email"`
-	Password  string       `json:"password"`
-	Status    UserStatus   `json:"status"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
-	DeletedAt sql.NullTime `json:"deleted_at"`
+	ID        uuid.UUID        `json:"id"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"`
+	Status    constants.Status `json:"status"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt sql.NullTime     `json:"updated_at"`
+	DeletedAt sql.NullTime     `json:"deleted_at"`
 }

@@ -21,10 +21,10 @@ func NewUserRepository(trx *config.Trx) domain.UserRepository {
 }
 
 func (u *userRepository) Create(ctx context.Context, data model.UserCreate) (err error) {
-	log.Debug().Msgf("creating user: %v", data)
+	log.Debug().Msgf("creating user")
 	query := `--sql
 		INSERT INTO users (id, email, password, status)
-		VALUES ($1, $2, $2, $4);
+		VALUES ($1, $2, $3, $4);
 	`
 
 	db := u.trx.GetConn(ctx)
