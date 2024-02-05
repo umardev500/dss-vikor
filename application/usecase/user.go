@@ -52,10 +52,33 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 	return response
 }
 
-func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) (err error) {
-	err = u.repo.Delete(ctx, params)
+func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model.Response {
+	var response model.Response
 
-	return
+	err := u.repo.Delete(ctx, params)
+	if err != nil {
+		uuid := uuid.New()
+		userMsg := "failed to delete user"
+
+		// Handle not affected error
+		if err == constants.ErrorNotAffected {
+			userMsg = "failed to delete user, user not found"
+			response = utils.ResponseBuilder(uuid, fiber.StatusNotFound, false, userMsg, nil)
+			return response
+		}
+
+		pqErr := utils.ParsePostgresError(err)
+		if pqErr != nil {
+			utils.CombinePqErr(pqErr.Error(), &userMsg)
+		}
+		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
+		log.Error().Msgf("error deleting user: %v", err)
+		return response
+	}
+
+	response = utils.ResponseBuilder(params.UserID, fiber.StatusCreated, true, "user deleted successfully", nil)
+
+	return response
 }
 
 func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res model.Response, err error) {

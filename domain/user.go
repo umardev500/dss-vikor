@@ -17,7 +17,7 @@ type UserDelivery interface {
 
 type UserUsecase interface {
 	Create(context.Context, model.UserCreate) model.Response
-	Delete(context.Context, model.UserParams) error
+	Delete(context.Context, model.UserParams) model.Response
 	Find(context.Context, model.UserFind) (model.Response, error)
 	FindOne(context.Context, model.UserFind) (model.Response, error)
 	Update(context.Context, model.UserUpdate) error

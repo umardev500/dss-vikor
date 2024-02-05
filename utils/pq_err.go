@@ -23,7 +23,7 @@ func ParsePostgresError(err error) error {
 
 func CombinePqErr(from string, dest *string) {
 	if dest != nil && from != "" {
-		msg := fmt.Sprintf("%s. %s", from, *dest)
+		msg := fmt.Sprintf("%s. %s", *dest, from)
 		*dest = msg
 	}
 }

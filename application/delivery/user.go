@@ -72,9 +72,9 @@ func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
 	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
 	defer cancel()
 
-	err = u.uc.Delete(ctx, params)
+	resp := u.uc.Delete(ctx, params)
 
-	return
+	return c.JSON(resp)
 }
 
 // Find implements domain.UserDelivery.
