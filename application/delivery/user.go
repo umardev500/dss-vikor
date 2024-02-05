@@ -24,6 +24,7 @@ func NewUserDelivery(uc domain.UserUsecase, router fiber.Router) {
 	}
 
 	router.Post("/", handler.Create)
+	router.Delete("/:id", handler.Delete)
 }
 
 // Create implements domain.UserDelivery.
@@ -54,8 +55,15 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 	uid, err := uuid.Parse(id)
+
 	if err != nil {
-		return err
+		debugID := uuid.New()
+		resp := utils.ResponseBuilder(debugID, fiber.StatusBadRequest, false, err.Error(), nil)
+		bodyRaw := string(c.BodyRaw())
+		logData := utils.LogBuilder(debugID, "failed to parse request body", bodyRaw, err)
+		log.Error().Msg(logData)
+
+		return c.JSON(resp)
 	}
 
 	userID := uuid.New()
