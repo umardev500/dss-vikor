@@ -27,13 +27,23 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 	var response model.Response
 	var uid uuid.UUID = uuid.New()
 	user.Data.ID = uid
+	var pass, err = utils.GeneratBcryptHash(user.Data.Password)
+	if err != nil {
+		userMsg := "failed to create user"
+		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(user), err)
+		log.Error().Msg(msg)
+		return response
+	}
+
+	user.Data.Password = pass
 
 	statusIsEmpty := user.Data.Status == ""
 	if statusIsEmpty {
 		user.Data.Status = constants.Inactive
 	}
 
-	err := u.repo.Create(ctx, user)
+	err = u.repo.Create(ctx, user)
 	if err != nil {
 		userMsg := "failed to create user"
 		pqErr := utils.ParsePostgresError(err)
