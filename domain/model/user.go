@@ -20,13 +20,20 @@ type UserFind struct {
 }
 
 type UserUpdate struct {
-	Params UserParams
-	Data   User
+	Params UserParams   `json:"params"`
+	Data   UserToUpdate `json:"data"`
+}
+
+type UserToUpdate struct {
+	ID       uuid.UUID
+	Email    string           `json:"email"`
+	Password string           `json:"password"`
+	Status   constants.Status `json:"status"`
 }
 
 type UserCreate struct {
-	Params *UserParams
-	Data   *UserToCreate
+	Params *UserParams   `json:"params"`
+	Data   *UserToCreate `json:"data"`
 }
 
 // User model to create

@@ -64,16 +64,14 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 		if err == constants.ErrorNotAffected {
 			userMsg = "failed to delete user, user not found"
 			response = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
-			logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
-			log.Error().Msg(logData)
-			return response
+		} else {
+			pqErr := utils.ParsePostgresError(err)
+			if pqErr != nil {
+				utils.CombinePqErr(pqErr.Error(), &userMsg)
+			}
+			response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		}
 
-		pqErr := utils.ParsePostgresError(err)
-		if pqErr != nil {
-			utils.CombinePqErr(pqErr.Error(), &userMsg)
-		}
-		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
 		log.Error().Msg(logData)
 		return response
@@ -135,8 +133,30 @@ func (u *userUsecase) FindOne(ctx context.Context, params model.UserFind) (res m
 	return
 }
 
-func (u *userUsecase) Update(ctx context.Context, params model.UserUpdate) (err error) {
-	err = u.repo.Update(ctx, params)
+func (u *userUsecase) Update(ctx context.Context, params model.UserUpdate) (res model.Response) {
+	err := u.repo.Update(ctx, params)
+	if err != nil {
+		uid := uuid.New()
+
+		userMsg := "failed to update user"
+		if err == constants.ErrorNotAffected {
+			userMsg = "failed to update user, user not found"
+			res = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+		} else {
+			pqErr := utils.ParsePostgresError(err)
+			if pqErr != nil {
+				utils.CombinePqErr(pqErr.Error(), &userMsg)
+			}
+			res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		}
+
+		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
+		log.Error().Msg(logData)
+		return res
+
+	}
+
+	res = utils.ResponseBuilder(uuid.New(), fiber.StatusCreated, true, "user updated successfully", nil)
 
 	return
 }
