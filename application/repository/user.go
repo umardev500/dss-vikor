@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/config"
 	"github.com/umardev500/spk/constants"
 	"github.com/umardev500/spk/domain"
@@ -31,7 +30,6 @@ func (u *userRepository) Create(ctx context.Context, data model.UserCreate) (err
 
 	_, err = db.ExecContext(ctx, query, user.ID, user.Email, user.Password, user.Status)
 	if err != nil {
-		log.Error().Msgf("error creating user: %v", err)
 		return
 	}
 
@@ -46,13 +44,11 @@ func (u *userRepository) Delete(ctx context.Context, params model.UserParams) (e
 	db := u.trx.GetConn(ctx)
 	result, err := db.ExecContext(ctx, query, params.ID)
 	if err != nil {
-		log.Error().Msgf("error deleting user: %v", err)
 		return
 	}
 
 	affected, _ := result.RowsAffected()
 	if affected == 0 {
-		log.Error().Msgf("user with id %s not found", params.ID)
 		return constants.ErrorNotAffected
 	}
 
@@ -67,7 +63,6 @@ func (u *userRepository) Find(ctx context.Context, find model.UserFind) (users [
 	db := u.trx.GetConn(ctx)
 	cur, err := db.QueryxContext(ctx, query)
 	if err != nil {
-		log.Error().Msgf("")
 		return
 	}
 

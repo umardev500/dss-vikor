@@ -74,7 +74,6 @@ func NewTransaction(db DB) *Trx {
 //
 // It takes a context.Context as a parameter and returns a Queries object.
 func (t *Trx) GetConn(ctx context.Context) (db Queries) {
-	log.Debug().Msgf("Get database connection from context")
 	db, ok := ctx.Value(constants.CtxKeyTx).(Queries)
 	if !ok {
 		// log.Debug().Msgf("No database found in context, default is db used")

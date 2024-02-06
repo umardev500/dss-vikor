@@ -42,7 +42,7 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 		}
 		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
 
-		msg := fmt.Sprintf("error creating user: %v uuid: %s", err, uuid)
+		msg := utils.LogBuilder(uuid, userMsg, utils.StructToJson(user), err)
 		log.Error().Msg(msg)
 		return response
 	}
@@ -64,6 +64,8 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 		if err == constants.ErrorNotAffected {
 			userMsg = "failed to delete user, user not found"
 			response = utils.ResponseBuilder(uuid, fiber.StatusNotFound, false, userMsg, nil)
+			logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+			log.Error().Msg(logData)
 			return response
 		}
 
@@ -72,7 +74,8 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 			utils.CombinePqErr(pqErr.Error(), &userMsg)
 		}
 		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
-		log.Error().Msgf("error deleting user: %v", err)
+		logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+		log.Error().Msg(logData)
 		return response
 	}
 

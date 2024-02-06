@@ -25,6 +25,7 @@ func NewUserDelivery(uc domain.UserUsecase, router fiber.Router) {
 
 	router.Post("/", handler.Create)
 	router.Delete("/:id", handler.Delete)
+	router.Get("/", handler.Find)
 }
 
 // Create implements domain.UserDelivery.
