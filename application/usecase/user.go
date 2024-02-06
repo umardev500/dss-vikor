@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -25,8 +25,8 @@ func NewUserUsercase(repo domain.UserRepository) domain.UserUsecase {
 
 func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.Response {
 	var response model.Response
-	var uuid uuid.UUID = uuid.New()
-	user.Data.ID = uuid
+	var uid uuid.UUID = uuid.New()
+	user.Data.ID = uid
 
 	statusIsEmpty := user.Data.Status == ""
 	if statusIsEmpty {
@@ -40,14 +40,14 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 		if pqErr != nil {
 			utils.CombinePqErr(pqErr.Error(), &userMsg)
 		}
-		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
+		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 
-		msg := utils.LogBuilder(uuid, userMsg, utils.StructToJson(user), err)
+		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(user), err)
 		log.Error().Msg(msg)
 		return response
 	}
 
-	response = utils.ResponseBuilder(uuid, fiber.StatusCreated, true, "user created successfully", nil)
+	response = utils.ResponseBuilder(uid, fiber.StatusCreated, true, "user created successfully", nil)
 
 	return response
 }
@@ -56,15 +56,15 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 	var response model.Response
 
 	err := u.repo.Delete(ctx, params)
+	uid := uuid.New()
 	if err != nil {
-		uuid := uuid.New()
 		userMsg := "failed to delete user"
 
 		// Handle not affected error
 		if err == constants.ErrorNotAffected {
 			userMsg = "failed to delete user, user not found"
-			response = utils.ResponseBuilder(uuid, fiber.StatusNotFound, false, userMsg, nil)
-			logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+			response = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+			logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
 			log.Error().Msg(logData)
 			return response
 		}
@@ -73,21 +73,21 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 		if pqErr != nil {
 			utils.CombinePqErr(pqErr.Error(), &userMsg)
 		}
-		response = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
-		logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
 		log.Error().Msg(logData)
 		return response
 	}
 
-	response = utils.ResponseBuilder(params.UserID, fiber.StatusCreated, true, "user deleted successfully", nil)
+	response = utils.ResponseBuilder(uid, fiber.StatusCreated, true, "user deleted successfully", nil)
 
 	return response
 }
 
 func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res model.Response) {
 	users, err := u.repo.Find(ctx, params)
+	uid := uuid.New()
 	if err != nil {
-		uuid := uuid.New()
 		userMsg := "failed to find users"
 
 		pqErr := utils.ParsePostgresError(err)
@@ -95,19 +95,42 @@ func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res mode
 			utils.CombinePqErr(pqErr.Error(), &userMsg)
 		}
 
-		res = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
-		logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+		res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
 		log.Error().Msg(logData)
 		return res
 	}
 
-	res = utils.ResponseBuilder(uuid.New(), fiber.StatusOK, true, "users found successfully", users)
+	res = utils.ResponseBuilder(uid, fiber.StatusOK, true, "users found successfully", users)
 	return
 }
 
-func (u *userUsecase) FindOne(ctx context.Context, params model.UserFind) (res model.Response, err error) {
+func (u *userUsecase) FindOne(ctx context.Context, params model.UserFind) (res model.Response) {
 	user, err := u.repo.FindOne(ctx, params)
-	fmt.Println(user)
+	uid := uuid.New()
+	if err != nil {
+		// Handle error no data
+		if err == sql.ErrNoRows {
+			userMsg := "failed to find user, data not found"
+			res = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+			logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
+			log.Error().Msg(logData)
+			return res
+		}
+
+		userMsg := "failed to find user"
+		pqErr := utils.ParsePostgresError(err)
+		if pqErr != nil {
+			utils.CombinePqErr(pqErr.Error(), &userMsg)
+		}
+
+		res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
+		log.Error().Msg(logData)
+		return res
+	}
+
+	res = utils.ResponseBuilder(uid, fiber.StatusOK, true, "user found successfully", user)
 
 	return
 }

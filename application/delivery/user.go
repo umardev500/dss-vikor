@@ -26,6 +26,7 @@ func NewUserDelivery(uc domain.UserUsecase, router fiber.Router) {
 	router.Post("/", handler.Create)
 	router.Delete("/:id", handler.Delete)
 	router.Get("/", handler.Find)
+	router.Get("/:id", handler.FindOne)
 }
 
 // Create implements domain.UserDelivery.
@@ -55,21 +56,14 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 // Delete implements domain.UserDelivery.
 func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
-	uid, err := uuid.Parse(id)
-
-	if err != nil {
-		debugID := uuid.New()
-		resp := utils.ResponseBuilder(debugID, fiber.StatusBadRequest, false, err.Error(), nil)
-		bodyRaw := string(c.BodyRaw())
-		logData := utils.LogBuilder(debugID, "failed to parse request body", bodyRaw, err)
-		log.Error().Msg(logData)
-
-		return c.JSON(resp)
+	uid, hndl := ParseUUID(id, c)
+	if uid == nil {
+		return hndl
 	}
 
 	userID := uuid.New()
 
-	var params = model.UserParams{ID: uid, UserID: userID}
+	var params = model.UserParams{ID: *uid, UserID: userID}
 	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
 	defer cancel()
 
@@ -89,7 +83,17 @@ func (u *userDelivery) Find(c *fiber.Ctx) (err error) {
 
 // FindOne implements domain.UserDelivery.
 func (u *userDelivery) FindOne(c *fiber.Ctx) (err error) {
-	return
+	id := c.Params("id")
+	uid, hndl := ParseUUID(id, c)
+	if uid == nil {
+		return hndl
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	res := u.uc.FindOne(ctx, model.UserFind{ID: *uid})
+	return c.JSON(res)
 }
 
 // Update implements domain.UserDelivery.

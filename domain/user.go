@@ -19,7 +19,7 @@ type UserUsecase interface {
 	Create(context.Context, model.UserCreate) model.Response
 	Delete(context.Context, model.UserParams) model.Response
 	Find(context.Context, model.UserFind) model.Response
-	FindOne(context.Context, model.UserFind) (model.Response, error)
+	FindOne(context.Context, model.UserFind) model.Response
 	Update(context.Context, model.UserUpdate) error
 }
 

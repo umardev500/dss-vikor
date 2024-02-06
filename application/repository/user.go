@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/umardev500/spk/config"
 	"github.com/umardev500/spk/constants"
@@ -82,13 +83,16 @@ func (u *userRepository) Find(ctx context.Context, find model.UserFind) (users [
 
 func (u *userRepository) FindOne(ctx context.Context, find model.UserFind) (user model.User, err error) {
 	query := `--sql
-		SELECT * FROM users
+		SELECT * FROM users WHERE id = $1
 	`
 
 	db := u.trx.GetConn(ctx)
+	id := find.ID
+	fmt.Println("id:", id)
 
-	err = db.QueryRowxContext(ctx, query).StructScan(&user)
+	err = db.QueryRowxContext(ctx, query, id).StructScan(&user)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
