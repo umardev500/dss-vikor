@@ -84,10 +84,24 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 	return response
 }
 
-func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res model.Response, err error) {
+func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res model.Response) {
 	users, err := u.repo.Find(ctx, params)
-	fmt.Println(users)
+	if err != nil {
+		uuid := uuid.New()
+		userMsg := "failed to find users"
 
+		pqErr := utils.ParsePostgresError(err)
+		if pqErr != nil {
+			utils.CombinePqErr(pqErr.Error(), &userMsg)
+		}
+
+		res = utils.ResponseBuilder(uuid, fiber.StatusInternalServerError, false, userMsg, nil)
+		logData := utils.LogBuilder(uuid, userMsg, utils.StructToJson(params), err)
+		log.Error().Msg(logData)
+		return res
+	}
+
+	res = utils.ResponseBuilder(uuid.New(), fiber.StatusOK, true, "users found successfully", users)
 	return
 }
 

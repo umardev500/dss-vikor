@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,11 +39,12 @@ type UserToCreate struct {
 
 // User models
 type User struct {
-	ID        uuid.UUID        `json:"id"`
-	Email     string           `json:"email"`
-	Password  string           `json:"password"`
-	Status    constants.Status `json:"status"`
-	CreatedAt time.Time        `json:"created_at"`
-	UpdatedAt sql.NullTime     `json:"updated_at"`
-	DeletedAt sql.NullTime     `json:"deleted_at"`
+	ID        uuid.UUID        `json:"id" db:"id"`
+	Email     string           `json:"email" db:"email"`
+	Password  string           `json:"password" db:"password"`
+	Status    constants.Status `json:"status" db:"status"`
+	CreatedAt time.Time        `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time       `json:"updated_at,omitempty" db:"updated_at"`
+	DeletedAt *time.Time       `json:"deleted_at,omitempty" db:"deleted_at"`
+	Version   int64            `json:"version" db:"version"`
 }

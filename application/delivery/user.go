@@ -80,7 +80,11 @@ func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
 
 // Find implements domain.UserDelivery.
 func (u *userDelivery) Find(c *fiber.Ctx) (err error) {
-	return
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	res := u.uc.Find(ctx, model.UserFind{})
+	return c.JSON(res)
 }
 
 // FindOne implements domain.UserDelivery.

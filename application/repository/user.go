@@ -73,6 +73,8 @@ func (u *userRepository) Find(ctx context.Context, find model.UserFind) (users [
 		if err := cur.StructScan(&each); err != nil {
 			return nil, err
 		}
+
+		users = append(users, each)
 	}
 
 	return
