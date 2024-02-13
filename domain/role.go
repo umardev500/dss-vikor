@@ -12,6 +12,7 @@ type RoleUsecase interface {
 	Delete(ctx context.Context, id uuid.UUID) model.Response
 	Find(ctx context.Context, find model.RoleFind) model.Response
 	FindById(ctx context.Context, id uuid.UUID) model.Response
+	Update(ctx context.Context, id uuid.UUID, role model.RoleUpdate) model.Response
 }
 
 type RoleRepository interface {
@@ -19,5 +20,5 @@ type RoleRepository interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	Find(ctx context.Context, find model.RoleFind) ([]model.Role, error)
 	FindById(ctx context.Context, id uuid.UUID) (model.Role, error)
-	Update()
+	Update(ctx context.Context, id uuid.UUID, role model.RoleUpdate) error
 }

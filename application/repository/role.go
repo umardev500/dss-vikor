@@ -104,3 +104,28 @@ func (r *roleRepository) FindById(ctx context.Context, id uuid.UUID) (role model
 
 	return
 }
+
+// Update updates a role in the role repository.
+//
+// ctx context.Context, id uuid.UUID, role model.RoleUpdate
+// error
+func (r *roleRepository) Update(ctx context.Context, id uuid.UUID, role model.RoleUpdate) error {
+	query := `--sql
+		UPDATE roles
+		SET name = $2
+		WHERE id = $1
+	`
+
+	db := r.trx.GetConn(ctx)
+	result, err := db.ExecContext(ctx, query, id, role.Name)
+	if err != nil {
+		return err
+	}
+
+	affected, _ := result.RowsAffected()
+	if affected == 0 {
+		return constants.ErrorNotAffected
+	}
+
+	return err
+}

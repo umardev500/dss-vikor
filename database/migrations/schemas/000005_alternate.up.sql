@@ -8,6 +8,7 @@ CREATE TABLE alternates (
     address VARCHAR(255) NOT NULL,
     created_at timestamptz DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamptz DEFAULT NULL,
+    version int DEFAULT 1,
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 

@@ -25,6 +25,7 @@ func NewRoleDelivery(uc domain.RoleUsecase, r fiber.Router) {
 	r.Delete("/:id", handler.Delete)
 	r.Get("/", handler.Find)
 	r.Get("/:id", handler.FindById)
+	r.Put("/:id", handler.Update)
 }
 
 // Create is a Go function that handles the creation of a role.
@@ -94,5 +95,30 @@ func (r *roleDelivery) Find(c *fiber.Ctx) error {
 
 	find := model.RoleFind{}
 	resp := r.uc.Find(ctx, find)
+	return c.JSON(resp)
+}
+
+func (r *roleDelivery) Update(c *fiber.Ctx) error {
+	id := c.Params("id")
+	uid, hndl := ParseUUID(id, c)
+	if uid == nil {
+		return hndl
+	}
+
+	var role model.RoleUpdate
+	if err := c.BodyParser(&role); err != nil {
+		uuid := uuid.New()
+		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+		bodyRaw := string(c.Body())
+		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
+		log.Error().Msg(logData)
+
+		return c.JSON(resp)
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	resp := r.uc.Update(ctx, *uid, role)
 	return c.JSON(resp)
 }

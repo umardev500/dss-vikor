@@ -133,3 +133,32 @@ func (u *roleUsecase) FindById(ctx context.Context, id uuid.UUID) (resp model.Re
 	resp = utils.ResponseBuilder(uuid.New(), fiber.StatusOK, true, "find role", role)
 	return
 }
+
+// Update updates a role in the database.
+//
+// ctx context.Context, id uuid.UUID, role model.RoleUpdate
+// resp model.Response
+func (r *roleUsecase) Update(ctx context.Context, id uuid.UUID, role model.RoleUpdate) (resp model.Response) {
+	err := r.repo.Update(ctx, id, role)
+	if err != nil {
+		uid := uuid.New()
+		userMsg := "failed to update role"
+
+		if err == constants.ErrorNotAffected {
+			userMsg = "failed to update role, role not found"
+			resp = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+		} else {
+			pqErr := utils.ParsePostgresError(err)
+			if pqErr != nil {
+				utils.CombinePqErr(pqErr.Error(), &userMsg)
+			}
+			resp = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		}
+
+		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(id), err)
+		log.Error().Msg(msg)
+		return
+	}
+
+	return utils.ResponseBuilder(uuid.New(), fiber.StatusCreated, true, "role updated successfully", nil)
+}
