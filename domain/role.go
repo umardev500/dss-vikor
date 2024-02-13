@@ -19,4 +19,5 @@ type RoleRepository interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	Find(ctx context.Context, find model.RoleFind) ([]model.Role, error)
 	FindById(ctx context.Context, id uuid.UUID) (model.Role, error)
+	Update()
 }
