@@ -1,0 +1,17 @@
+CREATE TABLE roles (
+    id uuid PRIMARY KEY,
+    name text NOT NULL,
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamptz DEFAULT NULL
+);
+
+
+CREATE TRIGGER role_update_trigger
+    BEFORE UPDATE
+    ON roles
+    FOR EACH ROW
+        WHEN (
+            NEW.name IS DISTINCT FROM OLD.name
+        )
+EXECUTE FUNCTION update_function();
+
