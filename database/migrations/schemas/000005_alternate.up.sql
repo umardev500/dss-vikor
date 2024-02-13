@@ -2,7 +2,7 @@ CREATE TABLE alternates (
     id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     role_id UUID NOT NULL,
-    str VARCHAR(255) NOT NULL,
+    str VARCHAR(255) UNIQUE,
     experience INT NOT NULL,
     dob DATE NOT NULL,
     address VARCHAR(255) NOT NULL,

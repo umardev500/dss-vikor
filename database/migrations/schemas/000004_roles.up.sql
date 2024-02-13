@@ -1,6 +1,6 @@
 CREATE TABLE roles (
     id uuid PRIMARY KEY,
-    name text NOT NULL,
+    name text NOT NULL UNIQUE,
     created_at timestamptz DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamptz DEFAULT NULL
 );

@@ -21,4 +21,5 @@ func NewRouter(app *fiber.App, db *sqlx.DB) Router {
 func (r Router) Register() {
 	api := r.app.Group("api")
 	injection.UserInject(api, r.db)
+	injection.RoleInject(api, r.db)
 }
