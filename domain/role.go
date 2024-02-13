@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/umardev500/spk/domain/model"
 )
 
@@ -13,8 +14,10 @@ type RoleDelivery interface {
 
 type RoleUsecase interface {
 	Create(ctx context.Context, role model.RoleCreate) model.Response
+	Delete(ctx context.Context, id uuid.UUID) model.Response
 }
 
 type RoleRepository interface {
 	Create(ctx context.Context, role model.RoleCreate) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
