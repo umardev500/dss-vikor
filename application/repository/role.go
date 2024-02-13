@@ -36,6 +36,11 @@ func (r *roleRepository) Create(ctx context.Context, role model.RoleCreate) erro
 	return err
 }
 
+// Delete deletes a role from the repository.
+//
+// ctx - the context
+// id - the UUID of the role to delete
+// error - returns an error, if any
 func (r *roleRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `--sql
 		DELETE FROM roles WHERE id = $1;
@@ -54,4 +59,48 @@ func (r *roleRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return err
+}
+
+// Find finds roles based on the provided criteria.
+//
+// ctx context.Context, find model.RoleFind
+// []model.Role, error
+func (r *roleRepository) Find(ctx context.Context, find model.RoleFind) (roles []model.Role, err error) {
+	query := `--sql
+		SELECT * FROM roles
+	`
+	db := r.trx.GetConn(ctx)
+
+	cur, err := db.QueryxContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	roles = make([]model.Role, 0)
+
+	for cur.Next() {
+		var each model.Role
+		if err := cur.StructScan(&each); err != nil {
+			return nil, err
+		}
+
+		roles = append(roles, each)
+	}
+
+	return
+}
+
+// FindById description of the Go function.
+//
+// ctx context.Context, id uuid.UUID
+// role model.Role, err error
+func (r *roleRepository) FindById(ctx context.Context, id uuid.UUID) (role model.Role, err error) {
+	query := `--sql
+		SELECT * FROM roles WHERE id = $1
+	`
+
+	db := r.trx.GetConn(ctx)
+	err = db.QueryRowxContext(ctx, query, id).StructScan(&role)
+
+	return
 }

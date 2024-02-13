@@ -23,6 +23,8 @@ func NewRoleDelivery(uc domain.RoleUsecase, r fiber.Router) {
 
 	r.Post("/", handler.Create)
 	r.Delete("/:id", handler.Delete)
+	r.Get("/", handler.Find)
+	r.Get("/:id", handler.FindById)
 }
 
 // Create is a Go function that handles the creation of a role.
@@ -48,6 +50,9 @@ func (r *roleDelivery) Create(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
+// Delete deletes a role using the given context.
+//
+// It takes a fiber.Ctx pointer as a parameter and returns an error.
 func (r *roleDelivery) Delete(c *fiber.Ctx) error {
 	var id = c.Params("id")
 	uid, hndl := ParseUUID(id, c)
@@ -59,5 +64,35 @@ func (r *roleDelivery) Delete(c *fiber.Ctx) error {
 	defer cancel()
 
 	resp := r.uc.Delete(ctx, *uid)
+	return c.JSON(resp)
+}
+
+// FindById finds a role by its ID.
+//
+// It takes a fiber.Ctx as a parameter and returns an error.
+func (r *roleDelivery) FindById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	uid, hndl := ParseUUID(id, c)
+	if uid == nil {
+		return hndl
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	resp := r.uc.FindById(ctx, *uid)
+	return c.JSON(resp)
+}
+
+// Find description of the Go function.
+//
+// c: *fiber.Ctx parameter.
+// error return type.
+func (r *roleDelivery) Find(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	find := model.RoleFind{}
+	resp := r.uc.Find(ctx, find)
 	return c.JSON(resp)
 }
