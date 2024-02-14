@@ -47,9 +47,7 @@ func (u *userUsecase) Create(ctx context.Context, user model.UserCreate) model.R
 	if err != nil {
 		userMsg := "failed to create user"
 		pqErr := utils.ParsePostgresError(err)
-		if pqErr != nil {
-			utils.CombinePqErr(pqErr.Error(), &userMsg)
-		}
+		utils.CombinePqErr(pqErr, &userMsg)
 		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(user), err)
@@ -76,9 +74,7 @@ func (u *userUsecase) Delete(ctx context.Context, params model.UserParams) model
 			response = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
 		} else {
 			pqErr := utils.ParsePostgresError(err)
-			if pqErr != nil {
-				utils.CombinePqErr(pqErr.Error(), &userMsg)
-			}
+			utils.CombinePqErr(pqErr, &userMsg)
 			response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		}
 
@@ -99,9 +95,7 @@ func (u *userUsecase) Find(ctx context.Context, params model.UserFind) (res mode
 		userMsg := "failed to find users"
 
 		pqErr := utils.ParsePostgresError(err)
-		if pqErr != nil {
-			utils.CombinePqErr(pqErr.Error(), &userMsg)
-		}
+		utils.CombinePqErr(pqErr, &userMsg)
 
 		res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
@@ -128,9 +122,7 @@ func (u *userUsecase) FindOne(ctx context.Context, params model.UserFind) (res m
 
 		userMsg := "failed to find user"
 		pqErr := utils.ParsePostgresError(err)
-		if pqErr != nil {
-			utils.CombinePqErr(pqErr.Error(), &userMsg)
-		}
+		utils.CombinePqErr(pqErr, &userMsg)
 
 		res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		logData := utils.LogBuilder(uid, userMsg, utils.StructToJson(params), err)
@@ -154,9 +146,7 @@ func (u *userUsecase) Update(ctx context.Context, params model.UserUpdate) (res 
 			res = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
 		} else {
 			pqErr := utils.ParsePostgresError(err)
-			if pqErr != nil {
-				utils.CombinePqErr(pqErr.Error(), &userMsg)
-			}
+			utils.CombinePqErr(pqErr, &userMsg)
 			res = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
 		}
 

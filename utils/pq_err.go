@@ -21,9 +21,12 @@ func ParsePostgresError(err error) error {
 	return nil
 }
 
-func CombinePqErr(from string, dest *string) {
-	if dest != nil && from != "" {
-		msg := fmt.Sprintf("%s. %s", *dest, from)
-		*dest = msg
+func CombinePqErr(err error, dest *string) {
+	if err != nil {
+		if dest != nil {
+			msg := fmt.Sprintf("%s. %s", *dest, err.Error())
+			*dest = msg
+		}
 	}
+
 }
