@@ -58,7 +58,7 @@ func (r *roleDelivery) Create(c *fiber.Ctx) error {
 //
 // It takes a fiber.Ctx pointer as a parameter and returns an error.
 func (r *roleDelivery) Delete(c *fiber.Ctx) error {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -74,7 +74,7 @@ func (r *roleDelivery) Delete(c *fiber.Ctx) error {
 //
 // It takes a fiber.Ctx as a parameter and returns an error.
 func (r *roleDelivery) FindById(c *fiber.Ctx) error {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -100,7 +100,7 @@ func (r *roleDelivery) Find(c *fiber.Ctx) error {
 }
 
 func (r *roleDelivery) Update(c *fiber.Ctx) error {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}

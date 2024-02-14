@@ -59,7 +59,7 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 
 // Delete implements domain.UserDelivery.
 func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -86,7 +86,7 @@ func (u *userDelivery) Find(c *fiber.Ctx) (err error) {
 
 // FindOne implements domain.UserDelivery.
 func (u *userDelivery) FindOne(c *fiber.Ctx) (err error) {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -100,7 +100,7 @@ func (u *userDelivery) FindOne(c *fiber.Ctx) (err error) {
 
 // Update implements domain.UserDelivery.
 func (u *userDelivery) Update(c *fiber.Ctx) (err error) {
-	uid, hndl := ParseUUID(c)
+	uid, hndl := utils.ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}

@@ -37,3 +37,21 @@ func GetRawBodySingleLine(c *fiber.Ctx) (res string, hndl, err error) {
 
 	return
 }
+
+func ParseUUID(c *fiber.Ctx) (*uuid.UUID, error) {
+	var id = c.Params("id")
+	uid, err := uuid.Parse(id)
+
+	if err != nil {
+		userMsg := "please provide valid uuid"
+		debugID := uuid.New()
+		resp := ResponseBuilder(debugID, fiber.StatusBadRequest, false, userMsg, nil)
+		bodyRaw := string(c.BodyRaw())
+		logData := LogBuilder(debugID, "failed to parse uuid", bodyRaw, err)
+		log.Error().Msg(logData)
+
+		return nil, c.JSON(resp)
+	}
+
+	return &uid, nil
+}
