@@ -9,9 +9,9 @@ import (
 
 type ParseData struct {
 	Field   string  `json:"field"`
-	Tag     string  `json:"Tag"`
+	Tag     string  `json:"tag"`
 	Param   *string `json:"param,omitempty"`
-	Message string  `json:"Message"`
+	Message string  `json:"message"`
 }
 
 func parseTag(tag, field, param string) ParseData {
