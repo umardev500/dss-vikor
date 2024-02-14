@@ -7,7 +7,8 @@ import (
 	"github.com/umardev500/spk/utils"
 )
 
-func ParseUUID(id string, c *fiber.Ctx) (*uuid.UUID, error) {
+func ParseUUID(c *fiber.Ctx) (*uuid.UUID, error) {
+	var id = c.Params("id")
 	uid, err := uuid.Parse(id)
 
 	if err != nil {

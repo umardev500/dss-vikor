@@ -37,7 +37,10 @@ func (r *roleDelivery) Create(c *fiber.Ctx) error {
 	if err := c.BodyParser(&role); err != nil {
 		uuid := uuid.New()
 		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
-		bodyRaw := string(c.Body())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			return hndl
+		}
 		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 
@@ -55,8 +58,7 @@ func (r *roleDelivery) Create(c *fiber.Ctx) error {
 //
 // It takes a fiber.Ctx pointer as a parameter and returns an error.
 func (r *roleDelivery) Delete(c *fiber.Ctx) error {
-	var id = c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -72,8 +74,7 @@ func (r *roleDelivery) Delete(c *fiber.Ctx) error {
 //
 // It takes a fiber.Ctx as a parameter and returns an error.
 func (r *roleDelivery) FindById(c *fiber.Ctx) error {
-	id := c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -99,8 +100,7 @@ func (r *roleDelivery) Find(c *fiber.Ctx) error {
 }
 
 func (r *roleDelivery) Update(c *fiber.Ctx) error {
-	id := c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -109,7 +109,10 @@ func (r *roleDelivery) Update(c *fiber.Ctx) error {
 	if err := c.BodyParser(&role); err != nil {
 		uuid := uuid.New()
 		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
-		bodyRaw := string(c.Body())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			return hndl
+		}
 		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 

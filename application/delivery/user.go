@@ -36,7 +36,10 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 	if err := c.BodyParser(&userData); err != nil {
 		uuid := uuid.New()
 		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
-		bodyRaw := string(c.BodyRaw())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			return hndl
+		}
 		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 
@@ -56,8 +59,7 @@ func (u *userDelivery) Create(c *fiber.Ctx) (err error) {
 
 // Delete implements domain.UserDelivery.
 func (u *userDelivery) Delete(c *fiber.Ctx) (err error) {
-	id := c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -84,8 +86,7 @@ func (u *userDelivery) Find(c *fiber.Ctx) (err error) {
 
 // FindOne implements domain.UserDelivery.
 func (u *userDelivery) FindOne(c *fiber.Ctx) (err error) {
-	id := c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -99,8 +100,7 @@ func (u *userDelivery) FindOne(c *fiber.Ctx) (err error) {
 
 // Update implements domain.UserDelivery.
 func (u *userDelivery) Update(c *fiber.Ctx) (err error) {
-	id := c.Params("id")
-	uid, hndl := ParseUUID(id, c)
+	uid, hndl := ParseUUID(c)
 	if uid == nil {
 		return hndl
 	}
@@ -109,7 +109,10 @@ func (u *userDelivery) Update(c *fiber.Ctx) (err error) {
 	if err := c.BodyParser(&userData); err != nil {
 		uuid := uuid.New()
 		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
-		bodyRaw := string(c.BodyRaw())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			return hndl
+		}
 		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 

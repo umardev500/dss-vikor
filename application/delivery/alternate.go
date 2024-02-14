@@ -37,7 +37,10 @@ func (a *alternateDelivery) Create(c *fiber.Ctx) error {
 			Success: false,
 			Message: err.Error(),
 		}
-		bodyRaw := string(c.Body())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			return hndl
+		}
 		logData := utils.LogBuilder(uid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 		return c.JSON(resp)
@@ -56,8 +59,6 @@ func (a *alternateDelivery) Create(c *fiber.Ctx) error {
 		}
 		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
 		if err != nil {
-			logData := utils.LogBuilder(uid, fiber.ErrUnprocessableEntity.Message, bodyRaw, err)
-			log.Error().Msg(logData)
 			return hndl
 		}
 
