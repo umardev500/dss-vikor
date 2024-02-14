@@ -1,6 +1,8 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Response struct {
 	ID      uuid.UUID   `json:"id"`
@@ -8,4 +10,5 @@ type Response struct {
 	Success bool        `json:"success"`
 	Message interface{} `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+	Fields  interface{} `json:"fields,omitempty"`
 }

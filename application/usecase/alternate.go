@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -26,18 +25,28 @@ func (u *alternateUsecase) Create(ctx context.Context, altrnt model.AlternateCre
 	uid := uuid.New()
 	altrnt.ID = uid
 
-	fmt.Println(altrnt)
-
 	err := u.repo.Create(ctx, altrnt)
 	if err != nil {
 		userMsg := "failed to create alternate"
 		pqErr := utils.ParsePostgresError(err)
 		utils.CombinePqErr(pqErr, &userMsg)
-		resp = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		resp = model.Response{
+			ID:      uid,
+			Status:  fiber.StatusInternalServerError,
+			Success: false,
+			Message: userMsg,
+		}
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(altrnt), err)
 		log.Error().Msg(msg)
 		return
 	}
 
-	return utils.ResponseBuilder(uid, fiber.StatusCreated, true, "alternate created successfully", nil)
+	resp = model.Response{
+		ID:      uid,
+		Status:  fiber.StatusInternalServerError,
+		Success: false,
+		Message: "alternate created successfully",
+	}
+
+	return resp
 }

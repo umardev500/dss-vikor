@@ -23,7 +23,7 @@ type AlternateCreate struct {
 	ID         uuid.UUID `json:"-"`
 	Name       string    `json:"name" validate:"required"`
 	RoleID     string    `json:"role_id" validate:"required"`
-	STR        string    `json:"str"`
+	STR        string    `json:"str" validate:"required"`
 	Experience int       `json:"experience" validate:"gte=0"`
 	DOB        time.Time `json:"dob" validate:"required"`
 	Address    string    `json:"address" validate:"required"`

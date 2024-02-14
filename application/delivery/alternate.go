@@ -30,20 +30,32 @@ func NewAlternateDelivery(uc domain.AlternateUsecase, r fiber.Router, v *validat
 func (a *alternateDelivery) Create(c *fiber.Ctx) error {
 	var alternate model.AlternateCreate
 	if err := c.BodyParser(&alternate); err != nil {
-		uuid := uuid.New()
-		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+		uid := uuid.New()
+		resp := model.Response{
+			ID:      uid,
+			Status:  fiber.StatusBadRequest,
+			Success: false,
+			Message: err.Error(),
+		}
 		bodyRaw := string(c.Body())
-		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
+		logData := utils.LogBuilder(uid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 		return c.JSON(resp)
 	}
 
 	// Validate the struct
-	if err := a.v.Struct(alternate); err != nil {
-		uuid := uuid.New()
-		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+	fields, err := utils.ValidateStruct(a.v, alternate)
+	if err != nil {
+		uid := uuid.New()
+		resp := model.Response{
+			ID:      uid,
+			Status:  fiber.StatusUnprocessableEntity,
+			Success: false,
+			Message: "validation error",
+			Fields:  fields,
+		}
 		bodyRaw := string(c.Body())
-		logData := utils.LogBuilder(uuid, fiber.ErrBadRequest.Message, bodyRaw, err)
+		logData := utils.LogBuilder(uid, fiber.ErrUnprocessableEntity.Message, bodyRaw, err)
 		log.Error().Msg(logData)
 		return c.JSON(resp)
 	}
