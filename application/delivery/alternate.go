@@ -54,7 +54,13 @@ func (a *alternateDelivery) Create(c *fiber.Ctx) error {
 			Message: "validation error",
 			Fields:  fields,
 		}
-		bodyRaw := string(c.Body())
+		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
+		if err != nil {
+			logData := utils.LogBuilder(uid, fiber.ErrUnprocessableEntity.Message, bodyRaw, err)
+			log.Error().Msg(logData)
+			return hndl
+		}
+
 		logData := utils.LogBuilder(uid, fiber.ErrUnprocessableEntity.Message, bodyRaw, err)
 		log.Error().Msg(logData)
 		return c.JSON(resp)
