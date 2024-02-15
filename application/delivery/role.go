@@ -107,13 +107,18 @@ func (r *roleDelivery) Update(c *fiber.Ctx) error {
 
 	var role model.RoleUpdate
 	if err := c.BodyParser(&role); err != nil {
-		uuid := uuid.New()
-		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+		uid := uuid.New()
+		resp := model.Response{
+			ID:      uid,
+			Status:  fiber.StatusBadRequest,
+			Success: false,
+			Message: fiber.ErrBadRequest.Message,
+		}
 		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
 		if err != nil {
 			return hndl
 		}
-		logData := utils.LogBuilder(uuid, "failed to parse request body", bodyRaw, err)
+		logData := utils.LogBuilder(uid, "failed to parse request body", bodyRaw, err)
 		log.Error().Msg(logData)
 
 		return c.JSON(resp)
