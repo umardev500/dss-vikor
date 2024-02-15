@@ -94,7 +94,7 @@ func (u *alternateRepository) Delete(ctx context.Context, id uuid.UUID) error {
 //	error - An error, if any, during the operation.
 func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind) ([]model.Alternate, error) {
 	query := `--sql
-		SELECT id, name, role_id, str, experience, dob, address FROM alternates WHERE 1=1
+		SELECT * FROM alternates WHERE 1=1
 	`
 
 	// Build query based on filter criteria
@@ -107,7 +107,7 @@ func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind
 	}
 	defer rows.Close()
 
-	var alternates = make([]model.Alternate, 0)
+	var alternates []model.Alternate
 	for rows.Next() {
 		var altrnt model.Alternate
 		if err := rows.StructScan(&altrnt); err != nil {
@@ -127,7 +127,7 @@ func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind
 // It returns the retrieved alternate and any error encountered.
 func (a *alternateRepository) FindById(ctx context.Context, id uuid.UUID) (altrnt model.Alternate, err error) {
 	query := `--sql
-		SELECT id, name, role_id, str, experience, dob, address FROM alternates WHERE id = $1
+		SELECT * FROM alternates WHERE id = $1
 	`
 	db := a.trx.GetConn(ctx)
 	err = db.QueryRowxContext(ctx, query, id).StructScan(&altrnt)

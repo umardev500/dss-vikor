@@ -16,7 +16,7 @@ type Alternate struct {
 	Address    string     `json:"address" db:"address"`
 	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt  *time.Time `json:"updated_at,omitempty" db:"updated_at"`
-	Version    int        `json:"version" db:"version"`
+	Version    int64      `json:"version" db:"version"`
 }
 
 type AlternateCreate struct {
