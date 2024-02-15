@@ -36,7 +36,12 @@ func (r *roleDelivery) Create(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&role); err != nil {
 		uuid := uuid.New()
-		resp := utils.ResponseBuilder(uuid, fiber.StatusBadRequest, false, err.Error(), nil)
+		resp := model.Response{
+			ID:      uuid,
+			Status:  fiber.StatusBadRequest,
+			Success: false,
+			Message: fiber.ErrBadRequest.Message,
+		}
 		bodyRaw, hndl, err := utils.GetRawBodySingleLine(c)
 		if err != nil {
 			return hndl

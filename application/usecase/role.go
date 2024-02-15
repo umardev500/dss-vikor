@@ -38,7 +38,12 @@ func (u *roleUsecase) Create(ctx context.Context, role model.RoleCreate) model.R
 		userMsg := "failed to create role"
 		pqErr := utils.ParsePostgresError(err)
 		utils.CombinePqErr(pqErr, &userMsg)
-		response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		response = model.Response{
+			ID:      uid,
+			Status:  fiber.StatusInternalServerError,
+			Success: false,
+			Message: userMsg,
+		}
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(role), err)
 		log.Error().Msg(msg)
 		return response
@@ -61,11 +66,21 @@ func (u *roleUsecase) Delete(ctx context.Context, id uuid.UUID) model.Response {
 
 		if err == constants.ErrorNotAffected {
 			userMsg = "failed to delete role, role not found"
-			response = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+			response = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusNotFound,
+				Success: false,
+				Message: userMsg,
+			}
 		} else {
 			pqErr := utils.ParsePostgresError(err)
 			utils.CombinePqErr(pqErr, &userMsg)
-			response = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+			response = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusInternalServerError,
+				Success: false,
+				Message: userMsg,
+			}
 		}
 
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(id), err)
@@ -87,13 +102,24 @@ func (u *roleUsecase) Find(ctx context.Context, find model.RoleFind) (resp model
 
 		pqErr := utils.ParsePostgresError(err)
 		utils.CombinePqErr(pqErr, &userMsg)
-		resp = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+		resp = model.Response{
+			ID:      uid,
+			Status:  fiber.StatusInternalServerError,
+			Success: false,
+			Message: userMsg,
+		}
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(find), err)
 		log.Error().Msg(msg)
 		return
 	}
 
-	resp = utils.ResponseBuilder(uuid.New(), fiber.StatusOK, true, "find roles", roles)
+	resp = model.Response{
+		ID:      uuid.New(),
+		Status:  fiber.StatusOK,
+		Success: true,
+		Message: "find roles",
+		Data:    roles,
+	}
 
 	return
 }
@@ -110,11 +136,21 @@ func (u *roleUsecase) FindById(ctx context.Context, id uuid.UUID) (resp model.Re
 
 		if err == sql.ErrNoRows {
 			userMsg = "failed to find roles, roles not found"
-			resp = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+			resp = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusNotFound,
+				Success: false,
+				Message: userMsg,
+			}
 		} else {
 			pqErr := utils.ParsePostgresError(err)
 			utils.CombinePqErr(pqErr, &userMsg)
-			resp = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+			resp = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusInternalServerError,
+				Success: false,
+				Message: userMsg,
+			}
 		}
 
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(id), err)
@@ -138,11 +174,21 @@ func (r *roleUsecase) Update(ctx context.Context, id uuid.UUID, role model.RoleU
 
 		if err == constants.ErrorNotAffected {
 			userMsg = "failed to update role, role not found"
-			resp = utils.ResponseBuilder(uid, fiber.StatusNotFound, false, userMsg, nil)
+			resp = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusNotFound,
+				Success: false,
+				Message: userMsg,
+			}
 		} else {
 			pqErr := utils.ParsePostgresError(err)
 			utils.CombinePqErr(pqErr, &userMsg)
-			resp = utils.ResponseBuilder(uid, fiber.StatusInternalServerError, false, userMsg, nil)
+			resp = model.Response{
+				ID:      uid,
+				Status:  fiber.StatusInternalServerError,
+				Success: false,
+				Message: userMsg,
+			}
 		}
 
 		msg := utils.LogBuilder(uid, userMsg, utils.StructToJson(id), err)
