@@ -26,4 +26,5 @@ func (r Router) Register() {
 	injection.RoleInject(api, r.db)
 	injection.AlternateInject(api, r.db, v)
 	injection.CriteriaInject(api, r.db, v)
+	injection.SubCriteriaInject(api, r.db, v)
 }
