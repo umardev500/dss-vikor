@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math"
 	"os"
 	"time"
 
@@ -83,6 +84,23 @@ func (t *Trx) GetConn(ctx context.Context) (db Queries) {
 	log.Debug().Msgf("Database found in context")
 
 	return
+}
+
+func (t *Trx) CountPage(ctx context.Context, schema string, perPage int64, args ...interface{}) (total, pages int64, err error) {
+	db := t.GetConn(ctx)
+
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE 1=1", schema)
+
+	var countTotal int64
+	err = db.QueryRowxContext(ctx, query, args...).Scan(&countTotal)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// Calculate total pages
+	pageCount := math.Ceil(float64(countTotal) / float64(perPage))
+
+	return countTotal, int64(pageCount), nil
 }
 
 // WithTransaction executes a function inside a transaction.

@@ -91,7 +91,9 @@ func (a *alternateUsecase) Delete(ctx context.Context, id uuid.UUID) (resp model
 }
 
 func (a *alternateUsecase) Find(ctx context.Context, find model.AlternateFind) (resp model.Response) {
-	alternates, err := a.repo.Find(ctx, find)
+	utils.BuildPageInfo(&find.PageInfo)
+
+	alternates, err := a.repo.Find(ctx, &find)
 	if err != nil {
 		uid := uuid.New()
 		userMsg := "failed to find alternates"
@@ -110,13 +112,20 @@ func (a *alternateUsecase) Find(ctx context.Context, find model.AlternateFind) (
 		return
 	}
 
-	return model.Response{
-		ID:      uuid.New(),
-		Status:  fiber.StatusOK,
-		Success: true,
-		Message: "find alternates",
-		Data:    alternates,
+	resp = model.Response{
+		ID:       uuid.New(),
+		Status:   fiber.StatusOK,
+		Success:  true,
+		Message:  "find alternates",
+		Data:     alternates,
+		PageInfo: find.PageInfo,
 	}
+
+	if len(alternates) == 0 {
+		resp.PageInfo = nil
+	}
+
+	return resp
 }
 
 func (a *alternateUsecase) FindById(ctx context.Context, id uuid.UUID) (resp model.Response) {

@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/config"
 	"github.com/umardev500/spk/constants"
 	"github.com/umardev500/spk/domain"
@@ -92,10 +94,22 @@ func (u *alternateRepository) Delete(ctx context.Context, id uuid.UUID) error {
 //
 //	[]model.Alternate - A slice of Alternate models that meet the filter criteria.
 //	error - An error, if any, during the operation.
-func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind) ([]model.Alternate, error) {
-	query := `--sql
+func (u *alternateRepository) Find(ctx context.Context, find *model.AlternateFind) ([]model.Alternate, error) {
+	query := `
 		SELECT * FROM alternates WHERE 1=1
 	`
+
+	// SORTING
+	sortInfo := find.PageInfo.SortInfo
+	sortStrategy := sortInfo.SortStrategy
+	sortBy := utils.GetSortBy(sortInfo.SortBy, model.AlternateSorting)
+
+	query += fmt.Sprintf(" ORDER BY %s %s", sortBy, sortStrategy)
+	// END OF SORTING
+
+	query += fmt.Sprintf(" LIMIT %d OFFSET %d", find.PageInfo.PerPage, find.PageInfo.Offset) // limiting
+
+	query = utils.SingleLineString(query) // clean query string
 
 	// Build query based on filter criteria
 	args := []interface{}{}
@@ -107,7 +121,7 @@ func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind
 	}
 	defer rows.Close()
 
-	var alternates []model.Alternate
+	var alternates = make([]model.Alternate, 0)
 	for rows.Next() {
 		var altrnt model.Alternate
 		if err := rows.StructScan(&altrnt); err != nil {
@@ -118,6 +132,19 @@ func (u *alternateRepository) Find(ctx context.Context, find model.AlternateFind
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
+	// GET PAGINATION INFO
+	info := find.PageInfo
+	pageTotal, pageCount, _ := u.trx.CountPage(ctx, "alternates", info.PerPage, args...)
+
+	// Assign to find info
+	find.PageInfo.TotalPages = int64(pageCount)
+	find.PageInfo.Items = pageTotal
+	find.PageInfo.SortInfo.SortBy = sortBy
+	find.PageInfo.Offset = info.Offset + 1
+	// END OF PAGINATION INFO
+
+	log.Debug().Msgf("query: %s, args: %v", query, args)
 
 	return alternates, nil
 }

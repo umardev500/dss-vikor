@@ -46,5 +46,16 @@ type AlternateFitler struct {
 }
 
 type AlternateFind struct {
-	Filter *AlternateFitler
+	Filter   *AlternateFitler
+	PageInfo PageInfo
+}
+
+var AlternateSorting map[string]string = map[string]string{
+	"created_at": "created_at",
+	"name":       "name",
+	"role":       "role_id",
+	"str":        "str",
+	"experience": "experience",
+	"dob":        "dob",
+	"address":    "address",
 }

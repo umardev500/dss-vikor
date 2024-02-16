@@ -98,7 +98,12 @@ func (a *alternateDelivery) Find(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
 	defer cancel()
 
-	find := model.AlternateFind{}
+	var pageInfo = model.PageInfo{}
+	utils.GetPageInfo(c, &pageInfo)
+
+	find := model.AlternateFind{
+		PageInfo: pageInfo,
+	}
 	resp := a.uc.Find(ctx, find)
 	return c.JSON(resp)
 }

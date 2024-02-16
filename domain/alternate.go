@@ -18,7 +18,7 @@ type AlternateUsecase interface {
 type AlternateRepository interface {
 	Create(ctx context.Context, altrnt model.AlternateCreate) error
 	Delete(ctx context.Context, id uuid.UUID) error
-	Find(ctx context.Context, find model.AlternateFind) ([]model.Alternate, error)
+	Find(ctx context.Context, find *model.AlternateFind) ([]model.Alternate, error)
 	FindById(ctx context.Context, id uuid.UUID) (model.Alternate, error)
 	Update(ctx context.Context, altrnt model.AlternateUpdate) error
 }

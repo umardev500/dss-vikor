@@ -2,12 +2,20 @@ package utils
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/umardev500/spk/domain/model"
 )
+
+func GetPageInfo(c *fiber.Ctx, info *model.PageInfo) {
+	offset, _ := strconv.Atoi(c.Query("offset", "0"))
+	perPage, _ := strconv.Atoi(c.Query("per_page", "0"))
+	info.Offset = int64(offset)
+	info.PerPage = int64(perPage)
+}
 
 func GetRawBodySingleLine(c *fiber.Ctx) (res string, hndl, err error) {
 	bodyRaw := string(c.Body())
